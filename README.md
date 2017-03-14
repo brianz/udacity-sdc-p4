@@ -197,6 +197,18 @@ an inverse transformation.  This takes us from the bird's eye view perspective b
 "normal" perspective which is simply the original.
 
 
+### Final test
+
+I have a single method, `LaneLineDetector.process` which can operate on a single image and output a
+final image.  I used this on multiple test images to ensure that it was working properly. Once I
+was happy with the output I ran the video file through this same function to get the final output
+video.
+
+An example output image from one of the test input images is shown below.
+
+![](example-images/final-test-img.png)
+
+
 ## Discussion
 
 Overall I think this code performed fairly well.  There was a bit of jitter in the calculation for
