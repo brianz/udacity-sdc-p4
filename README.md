@@ -15,7 +15,7 @@ The goals / steps of this project are the following:
 
 ## Project Structure
 
-This project is self-contained in the single Jupyter Notebook file, [FindingLanes.ipdb](FindingLanes.ipdb).
+This project is self-contained in the single Jupyter Notebook file, [LaneFinding.ipynb](LaneFinding.ipynb).
 
 ## Final results
 
