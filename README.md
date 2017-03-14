@@ -25,10 +25,9 @@ This project is self-contained in the single Jupyter Notebook file, [LaneFinding
 
 ## Camera Calibration
 
-Camera calibration was performed using the standard chessboard images which were provided in
-[https://github.com/udacity/CarND-Advanced-Lane-Lines/tree/master/camera_cal](the Udacity Github
-repo) for this project.
-
+Camera calibration was performed using the standard chessboard images which were provided in 
+[the Udacity Github](https://github.com/udacity/CarND-Advanced-Lane-Lines/tree/master/camera_cal) 
+repo for this project.
 
 Stepping through each image I used the `cv2.findChessboardCorners` method which can be found in the
 second cell of the Notebook. If corners were found for a particular images I kept track of the
