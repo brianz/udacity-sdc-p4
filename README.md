@@ -19,8 +19,6 @@ This project is self-contained in the single Jupyter Notebook file, [LaneFinding
 
 ## Final results
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/IRSBUBQPhng?ecver=1" frameborder="0" allowfullscreen></iframe>
-
 <a href="https://youtu.be/IRSBUBQPhng" target="_blank">
   <img src="http://img.youtube.com/vi/IRSBUBQPhng/0.jpg" border="10" />
 </a>
