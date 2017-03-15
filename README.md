@@ -56,9 +56,11 @@ obtained the following which looks accurate:
 ### Thresholding using color transformations and gradients
 
 The next step was creating a pipeline which takes an undistorted image as input and returns a
-binary/thresholded image as output.  This code can be seen in the `pipeline` command.
+binary/thresholded image as output.  This first iteration of my code can be seen in the `pipeline` command.
+While this version worked fairly well it one main problem where dark shadows across the road were
+being picked up as "good" pixels and threw off the polyfit.
 
-The thresholding consists of three steps:
+The original steps ere:
 
 - Convert the image to `HLS` color space and extract the `S` channel. The `S` channel was chosen
   because it does the best job of clearly identifying lanes
@@ -72,9 +74,42 @@ The thresholding consists of three steps:
 - Finally, create a final binary image which is effectively a union of the two images where pixels
   are "on" for either one of the two images.
 
-An example is shown below:
+An example is which worked well is shown below:
 
 ![](example-images/pipeline.png)
+
+An example is which *didn't* work well is shown below. The problem was the large shadow cast across
+the middle the lane:
+
+![](example-images/problematic-pipeline.png)
+
+After transforming to a top-down image that shadow created a large "on" spot at the bottom of the
+image:
+
+![](example-images/problematic-birds-eye-view.png)
+
+To fix this, I updated the thresholding to look at five different calculated attributes:
+
+- S channel in HLS color space
+- R channel in RGB
+- Sobel operator in:
+    - x and y direction
+    - gradient direction
+    - gradient magnitude
+
+The final binary image is created using a set of boolean operations where the following conditions
+are `OR`ed together:
+
+- S `AND` R channel 
+- SobelX `AND` SobelX channel 
+- SobelGradient `AND` SobelDirection channel 
+
+All of this logic may be seen in `LaneLineDetector.threshold`
+
+Comparing the results before and after the change in algorithm shows a clear improvement:
+
+![](example-images/problematic-pipeline.png)
+![](example-images/problematic-pipeline-fixed.png)
 
 
 ### Creating bird's eye view of lanes
@@ -136,12 +171,16 @@ The algorithm to detect the lane shape and fit a polynomial consists of:
   lane/bounding box. Save the `x, y` indices for all of the "on" pixels in these windows. This 
 - Using all of the "on" `x, y` indices get the corresponding coordinates and fit a second-order
   polynomial
-- At each iteration, I save the best fit and corresponding constants for the polynomial
+- At each iteration, I add the best fit x values to a 10-element `deque` and take the average
+  values as the true measure/fit.
 
 After this is done for the first time, subsequent iterations will take shorter approach since the
 sliding window method had already found the starting point for the lanes lines.  In
 `LaneLineDetector.find_next_polyfit` the work of finding the non-zero pixels is done again but
 without the sliding window process and _with_ a small margin.
+
+Previous I did not use the averaging technique...adding that adding a lot of stability to the
+movement of my detected lane borders.
 
 ### Calculating radius of curvature
 
@@ -163,8 +202,11 @@ where `self._y_eval` is just `height - 1` and `l1, l2, l3` are the constant term
 polynomial:
 
 ```
-left_curverad =  ((1 + (2 * l1 * self._y_eval * ym_per_pix + l2)**2)**1.5) / np.absolute(2 * l1)
+left_curved =  ((1 + (2 * l1 * self._y_eval * ym_per_pix + l2)**2)**1.5) / np.absolute(2 * l1)
 ```
+
+As with the x-values for the curve fitting, I calculated an average radius using the last 10
+measurements. To report a *final* radius I then take and average between the right and left values.
 
 
 ### Calculating offset from center
@@ -183,6 +225,8 @@ bottom of the image or the actual height of the image.
   versa.
 - Finally apply the same "meters per pixel" conversion to the pixel offset from center
 
+Offset also uses the averaging technique as explained in the polynomial fitting and radius
+sections.
 
 ### Drawing lane area on image
 
@@ -208,11 +252,11 @@ An example output image from one of the test input images is shown below.
 
 ## Discussion
 
-Overall I think this code performed fairly well.  There was a bit of jitter in the calculation for
-the radius which makes me think the images/video look better than the calculations themselves.
-There must be some error in the calculations because the radius values are changing much too
-quickly during the move. 
+Overall I think this code performed fairly well.  Previously I had some jitter in the calculation for
+the radius and offset.  Using the averaging technique for curve fitting, radius and offset helped
+significantly. 
 
-To improve this I would spend more time playing with the gradient and thresholding numbers to find
-an optimum pipeline to use.  Additionally, I would look at using different types of filtering and
-color spaces.
+I also saw a huge improvement when adding in the sobel thresholding techniques for direction and
+magnitude. This makes sense, especially for direction since lane lines (when driving straight)
+should almost always be pointing in an expected direction. Adding this made a huge difference by
+*not* picking up the shadows across the road.
