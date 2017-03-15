@@ -19,8 +19,8 @@ This project is self-contained in the single Jupyter Notebook file, [LaneFinding
 
 ## Final results
 
-<a href="https://youtu.be/IRSBUBQPhng" target="_blank">
-  <img src="http://img.youtube.com/vi/IRSBUBQPhng/0.jpg" border="10" />
+<a href="https://youtu.be/JxopSjc3BHo" target="_blank">
+  <img src="http://img.youtube.com/vi/JxopSjc3BHo/0.jpg" border="10" />
 </a>
 
 ## Camera Calibration
